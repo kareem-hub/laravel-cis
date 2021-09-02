@@ -31,33 +31,53 @@ class UsersController extends Controller
         return view('create');
     }
 
+    public function destroy($id)
+    {
+        DB::table('users')->where('id', $id)->delete();
+        return redirect()->back();
+    }
+
     public function store()
     {
-        $newUser = new User();
-        $newPost = new Post();
-
-        $newUser->id = request('id');
-        $newUser->name = request('name');
-        $newPost->user_id = request('id');
-        $newPost->user_post_type = request('postType');
-
-        if (empty(request('id')) or empty(request('name'))) {
-            return redirect('/create')->with('msg', 'Id or name cannot be empty');
+        if (empty(request('id'))) {
+            return redirect('/create')->with('msg', 'Id cannot be empty');
         }
 
-        if (request('id') < 0 or strlen(request('name')) < 2) {
-            return redirect('/create')->with('msg', 'invalid id or name');
+        if (empty(request('name'))) {
+            return redirect('/create')->with('msg', 'Name cannot be empty');
+        }
+
+        if (request('id') < 0) {
+            return redirect('/create')->with('msg', 'invalid id');
+        }
+
+        if (strlen(request('name')) < 2) {
+            return redirect('/create')->with('msg', 'invalid name');
         }
 
         if (User::where('id', request('id'))->exists()) {
             return redirect('/create')->with('msg', 'id is already taken');
-        } else {
-            $newUser->save();
-            if ($newPost->user_post_type) {
-                $newPost->save();
-            }
-            User::find(request('id'))->notify(new NewUserNotification());
-            return redirect('/create')->with('msg', 'New user created successfully');
         }
+
+        if (!request('postType')) {
+            User::create(request()->all());
+            return redirect('/create')->with('msg', 'New user created successfully');
+        } else {
+            if (strlen(request('postType')) > 2) {
+                if (is_numeric(request('postType'))) {
+                    return redirect('/create')->with('msg', 'post type cannot be numeric');
+                } else {
+                    User::create(request()->all());
+                    Post::create(['user_id' => request('id'), 'user_post_type' => request('postType')]);
+                    return redirect('/create')->with('msg', 'New user with post created successfully');
+                }
+            } else {
+                return redirect('/create')->with('msg', 'post type cannot be less than 2 characterss');
+            }
+        }
+
+        User::find(request('id'))->notify(new NewUserNotification());
+
+        return redirect('/create')->with('msg', 'Something bad happend');
     }
 }

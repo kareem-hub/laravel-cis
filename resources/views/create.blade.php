@@ -2,7 +2,7 @@
 @section('content')
 <center>
     @if (session()->has('msg'))
-    @if (session('msg') == 'New user created successfully')
+    @if (str_contains(session('msg') ,'New'))
     <div class="alert-success col-sm-4">{{session('msg')}}</div>
     @else
     <div class="alert-danger col-sm-4">{{session('msg')}}</div>

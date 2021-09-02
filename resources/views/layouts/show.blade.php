@@ -17,6 +17,7 @@
             <th>id</th>
             <th>Name</th>
             <th>post title</th>
+            <th>options</th>
         </tr>
     </thead>
             @yield('content')

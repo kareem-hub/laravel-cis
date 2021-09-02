@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', 'App\Http\Controllers\UsersController@index');
+Route::delete('/{id}', 'App\Http\Controllers\UsersController@destroy');
 Route::get('/show', 'App\Http\Controllers\UsersController@show');
 Route::get('/create', 'App\Http\Controllers\UsersController@create');
 Route::post('/create', 'App\Http\Controllers\UsersController@store');
